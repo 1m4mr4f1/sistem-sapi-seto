@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function getProducts() {
   try {
-    // Mengambil semua produk, diurutkan dari stok paling sedikit (agar tahu mana yang mau habis)
+    // Mengambil semua produk, diurutkan dari stok paling sedikit
     const products = await prisma.product.findMany({
       orderBy: {
         stock: 'asc', 
@@ -41,5 +41,17 @@ export async function getProductsPaginated(page: number = 1, itemsPerPage: numbe
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Gagal mengambil data produk');
+  }
+} // <--- PERBAIKAN: Kurung kurawal penutup ditambahkan di sini
+
+export async function getProductById(id: string) {
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: BigInt(id) },
+    });
+    return product;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return null;
   }
 }

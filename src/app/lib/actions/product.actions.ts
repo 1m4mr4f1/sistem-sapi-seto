@@ -27,9 +27,48 @@ export async function createProduct(formData: FormData) {
     },
   });
 
-  // 4. Refresh halaman daftar produk agar data baru muncul
+  // 4. Refresh halaman daftar produk
   revalidatePath('/dashboard/products');
 
-  // 5. Kembali ke halaman list
-  redirect('/dashboard/products');
+  // 5. Kembali ke halaman list dengan status created
+  redirect('/dashboard/products?status=created');
+}
+
+export async function updateProduct(formData: FormData) {
+  const id = formData.get('id') as string;
+  const name = formData.get('product_name') as string;
+  const stock = Number(formData.get('stock'));
+  const selling_price = Number(formData.get('selling_price'));
+  const last_purchase_price = Number(formData.get('last_purchase_price'));
+
+  if (!id || !name || stock < 0 || selling_price < 0) {
+    throw new Error('Data tidak valid.');
+  }
+
+  await prisma.product.update({
+    where: { id: BigInt(id) },
+    data: {
+      product_name: name,
+      stock: stock,
+      selling_price: selling_price,
+      last_purchase_price: last_purchase_price || 0,
+    },
+  });
+
+  revalidatePath('/dashboard/products');
+  
+  // Redirect dengan status updated
+  redirect('/dashboard/products?status=updated');
+}
+
+export async function deleteProduct(formData: FormData) {
+  const id = formData.get('id') as string;
+
+  if (!id) return;
+
+  await prisma.product.delete({
+    where: { id: BigInt(id) },
+  });
+
+  revalidatePath('/dashboard/products');
 }

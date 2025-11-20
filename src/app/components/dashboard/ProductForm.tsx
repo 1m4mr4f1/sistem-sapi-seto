@@ -1,11 +1,22 @@
+// src/app/components/dashboard/ProductForm.tsx
 'use client';
 
-import { createProduct } from '@/app/lib/actions/product.actions';
+import { createProduct, updateProduct } from '@/app/lib/actions/product.actions';
 import { Save, X } from 'lucide-react';
 import Link from 'next/link';
 import { useFormStatus } from 'react-dom';
 
-function SubmitButton() {
+// Definisi tipe data untuk inisialisasi form (saat edit)
+type ProductData = {
+  id?: string;
+  product_name: string;
+  stock: number;
+  selling_price: number;
+  last_purchase_price?: number | null;
+};
+
+// Button Component dipisah agar bisa pakai useFormStatus
+function SubmitButton({ isEdit }: { isEdit: boolean }) {
   const { pending } = useFormStatus();
   
   return (
@@ -15,14 +26,21 @@ function SubmitButton() {
       className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
     >
       <Save size={18} />
-      {pending ? 'Menyimpan...' : 'Simpan Produk'}
+      {pending ? 'Menyimpan...' : isEdit ? 'Simpan Perubahan' : 'Simpan Produk'}
     </button>
   );
 }
 
-export default function ProductForm() {
+export default function ProductForm({ initialData }: { initialData?: ProductData }) {
+  // Tentukan Action: Jika ada initialData maka Update, jika tidak maka Create
+  const action = initialData ? updateProduct : createProduct;
+  const isEdit = !!initialData;
+
   return (
-    <form action={createProduct} className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 w-full">
+    <form action={action} className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 w-full">
+      {/* Hidden Input ID: Wajib ada saat mode Edit agar server tahu ID mana yang diupdate */}
+      {isEdit && <input type="hidden" name="id" value={initialData?.id} />}
+
       <div className="space-y-6">
         
         {/* Nama Produk */}
@@ -34,15 +52,16 @@ export default function ProductForm() {
             type="text"
             name="product_name"
             required
+            defaultValue={initialData?.product_name}
             placeholder="Contoh: Daging Has Dalam (Tenderloin)"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder:text-gray-400 bg-white"
           />
         </div>
 
-        {/* Stok Awal */}
+        {/* Stok */}
         <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">
-            Stok Awal (Kg)
+            Stok (Kg)
           </label>
           <input
             type="number"
@@ -50,7 +69,7 @@ export default function ProductForm() {
             required
             min="0"
             step="0.01"
-            defaultValue="0"
+            defaultValue={initialData?.stock}
             placeholder="0"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder:text-gray-400 bg-white"
           />
@@ -72,6 +91,7 @@ export default function ProductForm() {
                 required
                 min="0"
                 step="100"
+                defaultValue={initialData?.selling_price}
                 placeholder="0"
                 className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder:text-gray-400 bg-white"
               />
@@ -92,6 +112,7 @@ export default function ProductForm() {
                 name="last_purchase_price"
                 min="0"
                 step="100"
+                defaultValue={initialData?.last_purchase_price || ''}
                 placeholder="0"
                 className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder:text-gray-400 bg-white"
               />
@@ -105,7 +126,7 @@ export default function ProductForm() {
 
       {/* Tombol Aksi */}
       <div className="mt-8 flex items-center gap-4 border-t border-gray-200 pt-6">
-        <SubmitButton />
+        <SubmitButton isEdit={isEdit} />
         <Link 
           href="/dashboard/products"
           className="flex items-center gap-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 px-5 py-2.5 rounded-lg font-semibold transition-colors border border-gray-300"

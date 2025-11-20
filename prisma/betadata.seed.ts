@@ -1,17 +1,19 @@
 // prisma/betadata.seed.ts
 import { PrismaClient, PaymentStatus } from '@prisma/client';
-import * as bcrypt from 'bcrypt'; // <--- Tambahan Import
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🥩 MEMULAI SEEDING BETA DATA (SECURE)...');
-  
-  // ... (Bagian Hapus Data Lama / Clean up biarkan sama seperti sebelumnya) ...
+
+  // ------------------------------
+  // 1. CLEANUP (URUTAN AMAN TERHADAP FK)
+  // ------------------------------
+  await prisma.paymentPayable.deleteMany();
+  await prisma.paymentReceivable.deleteMany();
   await prisma.saleDetail.deleteMany();
   await prisma.purchaseDetail.deleteMany();
-  await prisma.paymentReceivable.deleteMany();
-  await prisma.paymentPayable.deleteMany();
   await prisma.sale.deleteMany();
   await prisma.purchase.deleteMany();
   await prisma.expense.deleteMany();
@@ -20,34 +22,33 @@ async function main() {
   await prisma.supplier.deleteMany();
   await prisma.user.deleteMany();
 
-  // --- BAGIAN USER DIPERBARUI DENGAN HASHING ---
+  // ------------------------------
+  // 2. USERS (HASH PASSWORD)
+  // ------------------------------
   console.log('👤 Membuat User dengan Password Terenkripsi...');
-  
-  const passwordAdmin = await bcrypt.hash('password123', 10); // Enkripsi password
+
   const owner = await prisma.user.create({
     data: {
       name: 'Pak Seto',
       username: 'admin',
-      password: passwordAdmin, // Simpan hasil enkripsi
+      password: await bcrypt.hash('password123', 10),
       role: 'admin',
     },
   });
 
-  const passwordKasir = await bcrypt.hash('kasir123', 10); // Enkripsi password
   const kasir = await prisma.user.create({
     data: {
       name: 'Mas Joko',
       username: 'kasir',
-      password: passwordKasir, // Simpan hasil enkripsi
+      password: await bcrypt.hash('kasir123', 10),
       role: 'cashier',
     },
   });
-  
-  // ... (Sisa kode ke bawah untuk Supplier, Customer, Produk, Transaksi biarkan SAMA PERSIS seperti sebelumnya) ...
-  // ... (Copy paste sisa kode dari file betadata.seed.ts sebelumnya di sini) ...
-  
-  // 3. BUAT SUPPLIER (Peternak Sapi)
-  console.log('truck: Membuat Supplier...');
+
+  // ------------------------------
+  // 3. SUPPLIERS
+  // ------------------------------
+  console.log('🚚 Membuat Supplier...');
   const peternakA = await prisma.supplier.create({
     data: {
       supplier_name: 'Kelompok Ternak Lembu Suro (Boyolali)',
@@ -62,7 +63,9 @@ async function main() {
     },
   });
 
-  // 4. BUAT CUSTOMER (Pedagang/Pelanggan)
+  // ------------------------------
+  // 4. CUSTOMERS
+  // ------------------------------
   console.log('👥 Membuat Customer...');
   const baksoPakKumis = await prisma.customer.create({
     data: {
@@ -78,15 +81,16 @@ async function main() {
     },
   });
 
-  // 5. BUAT PRODUK (Master Barang)
+  // ------------------------------
+  // 5. PRODUCTS
+  // ------------------------------
   console.log('📦 Membuat Produk Daging...');
-  
   const dagingHasDalam = await prisma.product.create({
     data: {
       product_name: 'Daging Has Dalam (Tenderloin)',
-      stock: 0, 
-      selling_price: 140000, 
-      last_purchase_price: 110000, 
+      stock: 0,
+      selling_price: 140000,
+      last_purchase_price: 110000,
     },
   });
 
@@ -108,30 +112,37 @@ async function main() {
     },
   });
 
-  // 6. TRANSAKSI PEMBELIAN
+  // ------------------------------
+  // 6. PURCHASE (dengan purchase_details create nested)
+  // ------------------------------
+  console.log('🧾 Membuat Pembelian...');
   const pembelian1 = await prisma.purchase.create({
     data: {
       user_id: owner.id,
       supplier_id: peternakA.id,
       purchase_date: new Date(),
-      total_purchase: 18500000, 
+      total_purchase: 18500000,
       payment_status: PaymentStatus.paid,
       note: 'Restock Daging Segar Harian',
       purchase_details: {
         create: [
           { product_id: dagingHasDalam.id, quantity: 50, price_at_purchase: 110000 },
           { product_id: igaSapi.id, quantity: 100, price_at_purchase: 75000 },
-          { product_id: dagingRawonan.id, quantity: 30, price_at_purchase: 60000 }
+          { product_id: dagingRawonan.id, quantity: 30, price_at_purchase: 60000 },
         ],
       },
     },
   });
 
+  // Update stok
   await prisma.product.update({ where: { id: dagingHasDalam.id }, data: { stock: { increment: 50 } } });
   await prisma.product.update({ where: { id: igaSapi.id }, data: { stock: { increment: 100 } } });
   await prisma.product.update({ where: { id: dagingRawonan.id }, data: { stock: { increment: 30 } } });
 
-  // 7. TRANSAKSI PENJUALAN
+  // ------------------------------
+  // 7. SALE (dengan sale_details create nested)
+  // ------------------------------
+  console.log('💰 Membuat Penjualan (Bon)...');
   const penjualanBon = await prisma.sale.create({
     data: {
       user_id: kasir.id,
@@ -143,16 +154,17 @@ async function main() {
       payment_status: PaymentStatus.unpaid,
       note: 'Bon, janji bayar lusa',
       sale_details: {
-        create: [
-          { product_id: dagingRawonan.id, quantity: 25, price_at_sale: 85000 }
-        ],
+        create: [{ product_id: dagingRawonan.id, quantity: 25, price_at_sale: 85000 }],
       },
     },
   });
 
+  // Update stok
   await prisma.product.update({ where: { id: dagingRawonan.id }, data: { stock: { decrement: 25 } } });
 
-  // 8. PENGELUARAN
+  // ------------------------------
+  // 8. EXPENSE
+  // ------------------------------
   await prisma.expense.create({
     data: {
       user_id: owner.id,
@@ -163,9 +175,15 @@ async function main() {
     },
   });
 
-  console.log('✅ SEEDING SELESAI! Database Secured.');
+  console.log('✅ SEEDING SELESAI! Database sudah terisi contoh data.');
 }
 
 main()
-  .then(async () => { await prisma.$disconnect(); })
-  .catch(async (e) => { console.error(e); await prisma.$disconnect(); process.exit(1); });
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error('Seed error:', e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

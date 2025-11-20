@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { LayoutDashboard, Package, ShoppingCart, Users, FileText, Settings } from 'lucide-react';
+// Tambahkan import 'Truck'
+import { LayoutDashboard, Package, ShoppingCart, Users, FileText, Settings, Truck } from 'lucide-react';
 
 export default function Sidebar() {
   return (
@@ -31,6 +32,12 @@ export default function Sidebar() {
         <Link href="/dashboard/customers" className="flex items-center px-6 py-3 text-gray-300 hover:bg-[#34495e] hover:text-white transition-colors border-l-4 border-transparent hover:border-blue-500">
           <Users size={18} className="mr-3" />
           <span>Pelanggan</span>
+        </Link>
+
+        {/* MENU BARU: SUPPLIERS */}
+        <Link href="/dashboard/suppliers" className="flex items-center px-6 py-3 text-gray-300 hover:bg-[#34495e] hover:text-white transition-colors border-l-4 border-transparent hover:border-blue-500">
+          <Truck size={18} className="mr-3" />
+          <span>Penyedia (Supplier)</span>
         </Link>
 
         <p className="px-6 text-xs text-gray-400 uppercase font-bold mb-2 mt-4">Lainnya</p>
