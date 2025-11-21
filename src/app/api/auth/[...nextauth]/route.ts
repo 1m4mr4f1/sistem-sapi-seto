@@ -4,8 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/prisma';
 import * as bcrypt from 'bcrypt';
 
-export const authOptions: NextAuthOptions = {
-  // Halaman login custom kita
+const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
   },
@@ -23,27 +22,19 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.username || !credentials?.password) {
           return null;
         }
-
-        // 1. Cari user berdasarkan username
         const user = await prisma.user.findUnique({
           where: { username: credentials.username },
         });
-
         if (!user) {
-          return null; // User tidak ditemukan
+          return null;
         }
-
-        // 2. Cek password (Bandingkan hash)
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
           user.password
         );
-
         if (!isPasswordValid) {
-          return null; // Password salah
+          return null;
         }
-
-        // 3. Login sukses -> Kembalikan data user (Konversi BigInt ke String)
         return {
           id: user.id.toString(),
           name: user.name,
@@ -54,8 +45,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // Memasukkan data tambahan (role & id) ke dalam token JWT
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }: { token: any; user: any }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -63,8 +53,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    // Memasukkan data dari token ke session frontend
-    async session({ session, token }: any) {
+    async session({ session, token }: { session: any; token: any }) {
       if (session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
