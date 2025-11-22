@@ -1,8 +1,38 @@
+'use client';
+
 import Link from 'next/link';
-// Tambahkan import 'Truck'
-import { LayoutDashboard, Package, ShoppingCart, Users, FileText, Settings, Truck } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { 
+  LayoutDashboard, 
+  Package, 
+  ShoppingCart, 
+  ShoppingBag, // Icon untuk Pembelian
+  Users, 
+  FileText, 
+  Truck 
+} from 'lucide-react';
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
+  // Helper function untuk cek status aktif
+  const isActive = (path: string) => {
+    // Khusus Dashboard (root), harus exact match
+    if (path === '/dashboard') {
+      return pathname === '/dashboard';
+    }
+    // Untuk menu lain, gunakan startsWith agar sub-halaman (create/edit) tetap menyalakan menu induknya
+    return pathname.startsWith(path);
+  };
+
+  // Class untuk menu aktif vs tidak aktif
+  const getLinkClass = (path: string) => {
+    const activeClass = "bg-[#34495e] text-white border-blue-500";
+    const inactiveClass = "text-gray-300 hover:bg-[#34495e] hover:text-white border-transparent hover:border-blue-500";
+    
+    return `flex items-center px-6 py-3 transition-colors border-l-4 ${isActive(path) ? activeClass : inactiveClass}`;
+  };
+
   return (
     <aside className="w-64 bg-[#2c3e50] text-white h-screen fixed left-0 top-0 flex flex-col shadow-xl z-50">
       {/* Logo Area */}
@@ -14,35 +44,40 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-4">
         <p className="px-6 text-xs text-gray-400 uppercase font-bold mb-2">Menu Utama</p>
         
-        <Link href="/dashboard" className="flex items-center px-6 py-3 text-gray-300 hover:bg-[#34495e] hover:text-white transition-colors border-l-4 border-transparent hover:border-blue-500">
+        <Link href="/dashboard" className={getLinkClass('/dashboard')}>
           <LayoutDashboard size={18} className="mr-3" />
           <span>Dashboard</span>
         </Link>
 
-        <Link href="/dashboard/products" className="flex items-center px-6 py-3 text-gray-300 hover:bg-[#34495e] hover:text-white transition-colors border-l-4 border-transparent hover:border-blue-500">
+        <Link href="/dashboard/products" className={getLinkClass('/dashboard/products')}>
           <Package size={18} className="mr-3" />
           <span>Data Produk</span>
         </Link>
 
-        <Link href="/dashboard/sales" className="flex items-center px-6 py-3 text-gray-300 hover:bg-[#34495e] hover:text-white transition-colors border-l-4 border-transparent hover:border-blue-500">
+        {/* MENU BARU: PEMBELIAN */}
+        <Link href="/dashboard/purchases" className={getLinkClass('/dashboard/purchases')}>
+          <ShoppingBag size={18} className="mr-3" />
+          <span>Pembelian</span>
+        </Link>
+
+        <Link href="/dashboard/sales" className={getLinkClass('/dashboard/sales')}>
           <ShoppingCart size={18} className="mr-3" />
           <span>Penjualan</span>
         </Link>
 
-        <Link href="/dashboard/customers" className="flex items-center px-6 py-3 text-gray-300 hover:bg-[#34495e] hover:text-white transition-colors border-l-4 border-transparent hover:border-blue-500">
+        <Link href="/dashboard/customers" className={getLinkClass('/dashboard/customers')}>
           <Users size={18} className="mr-3" />
           <span>Pelanggan</span>
         </Link>
 
-        {/* MENU BARU: SUPPLIERS */}
-        <Link href="/dashboard/suppliers" className="flex items-center px-6 py-3 text-gray-300 hover:bg-[#34495e] hover:text-white transition-colors border-l-4 border-transparent hover:border-blue-500">
+        <Link href="/dashboard/suppliers" className={getLinkClass('/dashboard/suppliers')}>
           <Truck size={18} className="mr-3" />
-          <span>Penyedia (Supplier)</span>
+          <span>Penyedia</span>
         </Link>
 
         <p className="px-6 text-xs text-gray-400 uppercase font-bold mb-2 mt-4">Lainnya</p>
 
-        <Link href="/dashboard/reports" className="flex items-center px-6 py-3 text-gray-300 hover:bg-[#34495e] hover:text-white transition-colors border-l-4 border-transparent hover:border-blue-500">
+        <Link href="/dashboard/reports" className={getLinkClass('/dashboard/reports')}>
           <FileText size={18} className="mr-3" />
           <span>Laporan</span>
         </Link>
