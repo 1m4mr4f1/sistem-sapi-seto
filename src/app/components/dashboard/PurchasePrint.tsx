@@ -123,7 +123,7 @@ export default function PurchasePrint({ data }: PurchasePrintProps) {
           @page { size: A4; margin: 0; }
           body { margin: 0; padding: 0; background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           header, footer, nav, aside { display: none !important; }
-        }
+        } 
       `}</style>
     </div>
   );
