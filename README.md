@@ -126,12 +126,6 @@ Dokumentasi:
 
 ---
 
-## 🚀 Deploy ke Vercel
-
-Gunakan platform Vercel untuk deployment.
-
----
-
 ## 📝 Lisensi
 
 Proyek ini dibuat untuk keperluan **portofolio** dan **manajemen bisnis pribadi**. Copyright © 2025 — **Sapi Seto System**.
