@@ -1,37 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🥩 Sistem Manajemen Toko Daging — **Sapi Seto POS & Inventory**
 
-## Getting Started
+Sistem informasi manajemen toko (Point of Sales & Inventory) berbasis web modern yang dibangun khusus untuk toko daging **Sapi Seto**. Aplikasi ini mendukung seluruh siklus operasional — mulai dari pembelian stok, manajemen gudang, penjualan kasir, hingga laporan keuangan secara real-time.
 
-First, run the development server:
+---
+
+## 👤 Akun Demo (Default Seed)
+
+Jika menggunakan data seed bawaan, Anda dapat login dengan akun berikut:
+
+```
+Username: admin
+Password: password123
+```
+
+---
+
+## 🚀 Fitur Utama
+
+### 1. 📦 Manajemen Stok (Inventory)
+
+* CRUD Produk (Nama, Stok, Harga Jual)
+* Stok otomatis berkurang saat penjualan & bertambah saat pembelian
+* Mendukung stok desimal (misal 1.5 Kg)
+* Notifikasi stok menipis di dashboard
+
+### 2. 🛒 Kasir & Penjualan (Point of Sales)
+
+* Input transaksi cepat dengan keranjang interaktif
+* Harga fleksibel (bisa diedit untuk tawar-menawar)
+* Cetak struk (A4 atau thermal)
+* Status pembayaran: **Lunas**, **Hutang**, **Cicilan**
+
+### 3. 🚚 Pembelian & Supplier (Restock)
+
+* Input barang masuk dari supplier
+* HPP otomatis dari harga beli terakhir
+* Manajemen hutang ke supplier
+
+### 4. 📊 Laporan & Analitik
+
+* Dashboard performa toko (omzet, laba, statistik harian)
+* Laporan penjualan berdasarkan tanggal
+* Laporan laba kotor & laba bersih
+* Laporan hutang pelanggan & supplier
+
+---
+
+## 📂 Struktur Database & Skrip
+
+* **Schema Prisma:** `prisma/schema.prisma`
+* **Data Seed:** `prisma/betadata.seed.ts`
+* **Backup/Skrip SQL:** folder `@/scripts/`
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+* **Framework:** Next.js 14 (App Router)
+* **Bahasa:** TypeScript
+* **Database:** MySQL
+* **ORM:** Prisma
+* **Styling:** Tailwind CSS
+* **Icons:** Lucide React
+* **Alerts:** SweetAlert2
+* **Keamanan:** Bcrypt (Password Hashing)
+
+---
+
+## ⚙️ Cara Instalasi & Menjalankan Proyek
+
+### **Prasyarat**
+
+* Node.js v18+
+* MySQL Server (XAMPP, Laragon, Docker, dll)
+
+### 1. **Clone Repositori**
+
+```bash
+git clone https://github.com/username-anda/sistem-sapi-seto.git
+cd sistem-sapi-seto
+```
+
+### 2. **Install Dependencies**
+
+```bash
+npm install
+```
+
+### 3. **Konfigurasi Environment**
+
+Buat file `.env` di root:
+
+```
+DATABASE_URL="mysql://root:@localhost:3306/db_sistem_sapi_seto"
+```
+
+### 4. **Migrasi & Seeding Database**
+
+```bash
+npx prisma migrate reset
+```
+
+### 5. **Jalankan Server Development**
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Akses: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔧 Tentang Next.js
 
-## Learn More
+File utama dapat diedit di:
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/page.tsx
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Dokumentasi:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* Next.js Docs
+* Learn Next.js
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Deploy ke Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# sistem-sapi-seto
+Gunakan platform Vercel untuk deployment.
+
+---
+
+## 📝 Lisensi
+
+Proyek ini dibuat untuk keperluan **portofolio** dan **manajemen bisnis pribadi**. Copyright © 2025 — **Sapi Seto System**.
